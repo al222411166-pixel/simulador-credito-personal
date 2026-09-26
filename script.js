@@ -49,7 +49,6 @@ function actualizarEstimados() {
     const totalFinanciar = monto + (monto * porcentajeComision * (1 + IVA_VALOR));
     const tasaMensual = (tasaAnual / 100) / 12;
 
-    // Fórmula de pago fijo nivelado para calcular el pago por cada 1000 prestados
     const cuotaMensualBase = totalFinanciar * ((tasaMensual * Math.pow(1 + tasaMensual, plazoMeses)) / (Math.pow(1 + tasaMensual, plazoMeses) - 1));
     const pagoPorMil = (cuotaMensualBase / totalFinanciar) * 1000;
 
@@ -93,12 +92,26 @@ function procesarSimulacion() {
   const tablaBody = document.querySelector('#tabla-amortizacion tbody');
   tablaBody.innerHTML = '';
 
+  // Variables acumuladoras para los totales
+  let sumaCapital = 0;
+  let sumaIntereses = 0;
+  let sumaPagoFijo = 0;
+  let sumaIva = 0;
+  let sumaPagoTotal = 0;
+
   for (let periodo = 1; periodo <= plazoMeses; periodo++) {
     const interesPeriodo = saldoInsoluto * tasaMensualEquivalente;
     const ivaPeriodo = interesPeriodo * IVA_VALOR;
     const pagoCapital = amortizacionCapital;
     const pagoFijoMensual = pagoCapital + interesPeriodo;
     const totalMes = pagoFijoMensual + ivaPeriodo;
+
+    // Acumular valores
+    sumaCapital += pagoCapital;
+    sumaIntereses += interesPeriodo;
+    sumaPagoFijo += pagoFijoMensual;
+    sumaIva += ivaPeriodo;
+    sumaPagoTotal += totalMes;
 
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -115,9 +128,22 @@ function procesarSimulacion() {
     saldoInsoluto -= amortizacionCapital;
     if (saldoInsoluto < 0.01) saldoInsoluto = 0;
   }
+
+  // Actualizar e insertar la fila de Totales en la tabla
+  document.getElementById('tot-capital').textContent = formatearMoneda(sumaCapital);
+  document.getElementById('tot-intereses').textContent = formatearMoneda(sumaIntereses);
+  document.getElementById('tot-fijo').textContent = formatearMoneda(sumaPagoFijo);
+  document.getElementById('tot-iva').textContent = formatearMoneda(sumaIva);
+  document.getElementById('tot-mensual').textContent = formatearMoneda(sumaPagoTotal);
+  document.getElementById('tabla-totales').style.display = 'table-footer-group';
+
+  // Actualizar tarjetas métricas
+  document.getElementById('resumen-intereses').textContent = formatearMoneda(sumaIntereses);
+  document.getElementById('resumen-iva').textContent = formatearMoneda(sumaIva);
+  document.getElementById('resumen-total-final').textContent = formatearMoneda(sumaPagoTotal);
+  document.getElementById('resumen-cards').style.display = 'grid';
 }
 
-// Función para reiniciar todos los campos y tabla
 function limpiarFormulario() {
   document.getElementById('cliente').value = '';
   document.getElementById('monto').value = '';
@@ -130,5 +156,8 @@ function limpiarFormulario() {
   document.getElementById('plazo').selectedIndex = 0;
   document.getElementById('tasa').selectedIndex = 0;
 
+  // Limpiar tabla, fila de totales y tarjetas
   document.querySelector('#tabla-amortizacion tbody').innerHTML = '';
+  document.getElementById('tabla-totales').style.display = 'none';
+  document.getElementById('resumen-cards').style.display = 'none';
 }
