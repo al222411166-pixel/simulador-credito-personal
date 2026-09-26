@@ -1,73 +1,134 @@
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('btn-calcular').addEventListener('click', procesarSimulacion);
-  document.getElementById('monto').addEventListener('input', actualizarTotalesEntrada);
-  document.getElementById('comision-select').addEventListener('change', actualizarTotalesEntrada);
+  const btnCalcular = document.getElementById('btn-calcular');
+  const btnLimpiar = document.getElementById('btn-limpiar');
+  const montoInput = document.getElementById('monto');
+  const comisionSelect = document.getElementById('comision-select');
+  const tasaSelect = document.getElementById('tasa');
+  const plazoSelect = document.getElementById('plazo');
 
-  actualizarTotalesEntrada();
-  procesarSimulacion();
+  btnCalcular.addEventListener('click', procesarSimulacion);
+  btnLimpiar.addEventListener('click', limpiarFormulario);
+
+  montoInput.addEventListener('input', recalcularTotales);
+  comisionSelect.addEventListener('change', recalcularTotales);
+  tasaSelect.addEventListener('change', actualizarEstimados);
+  plazoSelect.addEventListener('change', actualizarEstimados);
 });
 
 const IVA_VALOR = 0.16;
 
 function formatearMoneda(valor) {
+  if (isNaN(valor)) return '$0.00';
   return '$' + valor.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function actualizarTotalesEntrada() {
-  const monto = parseFloat(document.getElementById('monto').value) || 0;
+function recalcularTotales() {
+  const monto = parseFloat(document.getElementById('monto').value);
   const porcentajeComision = parseFloat(document.getElementById('comision-select').value) || 0;
 
-  // Cálculo de comisión con IVA incluido
-  const comisionSinIVA = monto * porcentajeComision;
-  const comisionConIVA = comisionSinIVA * (1 + IVA_VALOR);
+  if (isNaN(monto) || monto <= 0) {
+    document.getElementById('monto-comision').value = '';
+    document.getElementById('total-financiar').value = '';
+    return;
+  }
+
+  const comisionConIVA = monto * porcentajeComision * (1 + IVA_VALOR);
   const totalFinanciar = monto + comisionConIVA;
 
   document.getElementById('monto-comision').value = formatearMoneda(comisionConIVA);
   document.getElementById('total-financiar').value = formatearMoneda(totalFinanciar);
 }
 
-function procesarSimulacion() {
-  actualizarTotalesEntrada();
-
+function actualizarEstimados() {
   const monto = parseFloat(document.getElementById('monto').value);
-  const tasaAnual = parseFloat(document.getElementById('tasa').value) / 100;
+  const tasaAnual = parseFloat(document.getElementById('tasa').value);
   const plazoMeses = parseInt(document.getElementById('plazo').value);
   const porcentajeComision = parseFloat(document.getElementById('comision-select').value) || 0;
 
-  if (isNaN(monto) || monto <= 0) {
-    alert("Por favor ingrese un monto válido.");
+  if (monto > 0 && tasaAnual > 0 && plazoMeses > 0) {
+    const totalFinanciar = monto + (monto * porcentajeComision * (1 + IVA_VALOR));
+    const tasaMensual = (tasaAnual / 100) / 12;
+
+    // Fórmula de pago fijo nivelado para calcular el pago por cada 1000 prestados
+    const cuotaMensualBase = totalFinanciar * ((tasaMensual * Math.pow(1 + tasaMensual, plazoMeses)) / (Math.pow(1 + tasaMensual, plazoMeses) - 1));
+    const pagoPorMil = (cuotaMensualBase / totalFinanciar) * 1000;
+
+    document.getElementById('pago-por-mil').value = formatearMoneda(pagoPorMil);
+    document.getElementById('cat-val').value = (tasaAnual + 4.0).toFixed(1) + '%';
+  }
+}
+
+function procesarSimulacion() {
+  const monto = parseFloat(document.getElementById('monto').value);
+  const tasaSeleccionada = parseFloat(document.getElementById('tasa').value);
+  const plazoMeses = parseInt(document.getElementById('plazo').value);
+  const porcentajeComision = parseFloat(document.getElementById('comision-select').value) || 0;
+
+  if (!monto || monto <= 0) {
+    alert("Por favor ingrese un monto autorizado válido.");
+    document.getElementById('monto').focus();
     return;
   }
 
-  // Regla de amortización constante sobre saldo insoluto
+  if (isNaN(tasaSeleccionada)) {
+    alert("Por favor seleccione una tasa de interés.");
+    document.getElementById('tasa').focus();
+    return;
+  }
+
+  if (isNaN(plazoMeses)) {
+    alert("Por favor seleccione un plazo de financiamiento.");
+    document.getElementById('plazo').focus();
+    return;
+  }
+
+  recalcularTotales();
+  actualizarEstimados();
+
   const totalFinanciar = monto + (monto * porcentajeComision * (1 + IVA_VALOR));
   const amortizacionCapital = totalFinanciar / plazoMeses;
-  const tasaMensualEquivalente = tasaAnual / 12;
+  const tasaMensualEquivalente = (tasaSeleccionada / 100) / 12;
 
   let saldoInsoluto = totalFinanciar;
   const tablaBody = document.querySelector('#tabla-amortizacion tbody');
   tablaBody.innerHTML = '';
 
   for (let periodo = 1; periodo <= plazoMeses; periodo++) {
-    const interesDelPeriodo = saldoInsoluto * tasaMensualEquivalente;
-    const ivaSobreInteres = interesDelPeriodo * IVA_VALOR;
-    const pagoCapitalPeriodo = amortizacionCapital;
-    const pagoFijoMensual = pagoCapitalPeriodo + interesDelPeriodo;
-    const pagoMensualTotal = pagoFijoMensual + ivaSobreInteres;
+    const interesPeriodo = saldoInsoluto * tasaMensualEquivalente;
+    const ivaPeriodo = interesPeriodo * IVA_VALOR;
+    const pagoCapital = amortizacionCapital;
+    const pagoFijoMensual = pagoCapital + interesPeriodo;
+    const totalMes = pagoFijoMensual + ivaPeriodo;
 
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${periodo}</td>
       <td>${formatearMoneda(saldoInsoluto)}</td>
-      <td>${formatearMoneda(pagoCapitalPeriodo)}</td>
-      <td>${formatearMoneda(interesDelPeriodo)}</td>
+      <td>${formatearMoneda(pagoCapital)}</td>
+      <td>${formatearMoneda(interesPeriodo)}</td>
       <td>${formatearMoneda(pagoFijoMensual)}</td>
-      <td>${formatearMoneda(ivaSobreInteres)}</td>
-      <td style="font-weight: bold;">${formatearMoneda(pagoMensualTotal)}</td>
+      <td>${formatearMoneda(ivaPeriodo)}</td>
+      <td style="font-weight: 700; color: #0b2545;">${formatearMoneda(totalMes)}</td>
     `;
     tablaBody.appendChild(row);
 
     saldoInsoluto -= amortizacionCapital;
-    if (saldoInsoluto < 0) saldoInsoluto = 0;
+    if (saldoInsoluto < 0.01) saldoInsoluto = 0;
   }
+}
+
+// Función para reiniciar todos los campos y tabla
+function limpiarFormulario() {
+  document.getElementById('cliente').value = '';
+  document.getElementById('monto').value = '';
+  document.getElementById('monto-comision').value = '';
+  document.getElementById('total-financiar').value = '';
+  document.getElementById('pago-por-mil').value = '';
+  document.getElementById('cat-val').value = '';
+
+  document.getElementById('comision-select').selectedIndex = 0;
+  document.getElementById('plazo').selectedIndex = 0;
+  document.getElementById('tasa').selectedIndex = 0;
+
+  document.querySelector('#tabla-amortizacion tbody').innerHTML = '';
 }
