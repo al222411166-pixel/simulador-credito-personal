@@ -12,7 +12,7 @@ body {
 }
 
 .app-container {
-  max-width: 1080px;
+  max-width: 1100px;
   margin: 0 auto;
   background: #ffffff;
   padding: 28px 36px;
@@ -45,7 +45,7 @@ body {
 }
 
 .logo-accent {
-  color: #d88924; /* Tono ámbar/dorado corporativo */
+  color: #d88924;
   font-size: 32px;
   font-weight: 800;
 }
@@ -65,7 +65,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Barra de sección */
+/* Barra azul de subtítulo */
 .section-bar {
   background: linear-gradient(90deg, #0b2545, #134074);
   color: #ffffff;
@@ -77,7 +77,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Formulario */
+/* Layout del formulario */
 .form-layout {
   display: grid;
   grid-template-columns: 3.2fr 1fr;
@@ -122,7 +122,7 @@ input:focus, select:focus {
 }
 
 .input-editable {
-  background-color: #fff9db; /* Amarillo suave legible */
+  background-color: #fff9db;
   font-weight: 600;
   width: 175px;
 }
@@ -158,7 +158,7 @@ input:focus, select:focus {
   border-radius: 0 3px 3px 0;
 }
 
-/* Cuadros de aviso */
+/* Avisos */
 .bubble-info {
   border: 1px solid #d88924;
   background-color: #fffaf0;
@@ -208,7 +208,7 @@ input:focus, select:focus {
   background-color: #e2e8f0;
 }
 
-/* Caja de notas */
+/* Notas */
 .notes-box {
   margin-top: 18px;
   border: 1px solid #cbd5e1;
@@ -226,9 +226,46 @@ input:focus, select:focus {
   margin-bottom: 4px;
 }
 
-/* Tabla de cotización */
+/* Tarjetas métricas de totales */
+.resumen-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.metric-card {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  padding: 14px 18px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metric-card.highlight {
+  background: #eff6ff;
+  border-color: #134074;
+}
+
+.metric-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b2545;
+}
+
+/* Tabla */
 .table-section {
-  margin-top: 28px;
+  margin-top: 25px;
 }
 
 .sub-title {
@@ -274,4 +311,14 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   background-color: #edf2f7;
+}
+
+/* Fila de Totales */
+.row-totales td {
+  background-color: #0b2545;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  border: 1px solid #081a30;
+  padding: 10px 8px;
 }
