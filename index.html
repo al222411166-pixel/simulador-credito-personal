@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Encabezado con nueva marca RY DR -->
+    <!-- Encabezado RY DR -->
     <header class="header">
       <div class="logo-area">
         <span class="logo-primary">RY</span>
@@ -74,7 +74,6 @@
               <option value="34">34%</option>
             </select>
 
-            <!-- Campo Pago por mil -->
             <label class="label-inline" for="pago-por-mil">Pago por mil:</label>
             <input type="text" id="pago-por-mil" class="input-readonly bold" readonly placeholder="$0.00">
 
@@ -97,11 +96,27 @@
         <div class="notes-header">Notas del Sistema:</div>
         <p>- Recuerda que <strong>Top Up no cobra comisión por apertura (0%)</strong></p>
         <p>- Los campos resaltados en amarillo corresponden a la captura de datos.</p>
-        <p>- Selecciona la comisión, el plazo y la tasa para habilitar el cálculo de la cotización.</p>
+        <p>- La tabla desglosa cada periodo de amortización y suma los montos totales finales.</p>
       </div>
     </section>
 
-    <!-- Sección Cotización / Tabla -->
+    <!-- Resumen de Totales Globales -->
+    <div id="resumen-cards" class="resumen-container" style="display: none;">
+      <div class="metric-card">
+        <span class="metric-title">Total Intereses</span>
+        <span class="metric-value" id="resumen-intereses">$0.00</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-title">Total IVA (16%)</span>
+        <span class="metric-value" id="resumen-iva">$0.00</span>
+      </div>
+      <div class="metric-card highlight">
+        <span class="metric-title">Desembolso Total Final</span>
+        <span class="metric-value" id="resumen-total-final">$0.00</span>
+      </div>
+    </div>
+
+    <!-- Sección Cotización / Tabla con Totales -->
     <section class="card table-section">
       <h2 class="sub-title">Cotización Detallada</h2>
       <div class="table-responsive">
@@ -118,8 +133,19 @@
             </tr>
           </thead>
           <tbody>
-            <!-- Se llena dinámicamente -->
+            <!-- Generado dinámicamente -->
           </tbody>
+          <tfoot id="tabla-totales" style="display: none;">
+            <tr class="row-totales">
+              <td>TOTAL</td>
+              <td>-</td>
+              <td id="tot-capital">$0.00</td>
+              <td id="tot-intereses">$0.00</td>
+              <td id="tot-fijo">$0.00</td>
+              <td id="tot-iva">$0.00</td>
+              <td id="tot-mensual">$0.00</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </section>
