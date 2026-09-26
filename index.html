@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Crédito Personal - Banamex</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Encabezado -->
+    <header class="header">
+      <div class="logo-area">
+        <span class="logo-blue">citi</span><span class="logo-red">banamex</span>
+        <span class="logo-symbol">❖</span>
+      </div>
+      <h1 class="header-title">CRÉDITO PERSONAL BANAMEX y TOP UP</h1>
+    </header>
+
+    <!-- Sección Formulario -->
+    <section class="card">
+      <div class="section-bar">DATOS DEL CRÉDITO</div>
+      
+      <div class="form-layout">
+        <div class="form-fields">
+          <div class="field-row">
+            <label for="cliente">Nombre del cliente:</label>
+            <input type="text" id="cliente" class="input-editable" value="JUAN PEREZ">
+          </div>
+
+          <div class="field-row">
+            <label for="monto">Monto autorizado:</label>
+            <div class="input-prefix-group">
+              <span class="currency-symbol">$</span>
+              <input type="number" id="monto" class="input-editable" value="70000" step="1000">
+            </div>
+            <div class="bubble-info">El monto otorgado puede variar dependiendo de la capacidad de pago del cliente</div>
+          </div>
+
+          <div class="field-row">
+            <label for="comision-select">Comisión por apertura con IVA:</label>
+            <select id="comision-select">
+              <option value="0.01" selected>1%</option>
+              <option value="0.00">0% (Top Up)</option>
+              <option value="0.02">2%</option>
+            </select>
+            <input type="text" id="monto-comision" class="input-readonly" readonly value="$812.00">
+          </div>
+
+          <div class="field-row">
+            <label>Total a financiar:</label>
+            <input type="text" id="total-financiar" class="input-readonly bold" readonly value="$70,812.00">
+          </div>
+
+          <div class="field-row">
+            <label for="plazo">Plazo del crédito:</label>
+            <select id="plazo">
+              <option value="12">12 meses</option>
+              <option value="24">24 meses</option>
+              <option value="36" selected>36 meses</option>
+              <option value="48">48 meses</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label for="tasa">Tasa de interés anual:</label>
+            <select id="tasa">
+              <option value="22">22%</option>
+              <option value="25" selected>25%</option>
+              <option value="28">28%</option>
+              <option value="34">34%</option>
+            </select>
+            <div class="bubble-info bubble-tasa">La tasa de interés es de referencia, se otorga con base a evaluación crediticia</div>
+          </div>
+
+          <div class="field-row">
+            <label>CAT (Costo Anual Total):</label>
+            <input type="text" id="cat-val" class="input-readonly" readonly value="29.0%">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button id="btn-calcular" class="btn">Cotiza</button>
+          <button id="btn-limpiar" class="btn">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="notes-box">
+        <div class="notes-header">Notas:</div>
+        <p>- Recuerda que <strong>Top Up no cobra comisión por apertura (0%)</strong></p>
+        <p>- Campos amarillos son para captura de datos.</p>
+        <p>- Elige la comisión, el plazo y la tasa de referencia desplegando los selectores.</p>
+        <p>- La tabla inferior calcula amortizaciones lineales con saldos insolutos e IVA del 16% sobre intereses.</p>
+      </div>
+    </section>
+
+    <!-- Sección Cotización / Tabla -->
+    <section class="card table-section">
+      <h2 class="sub-title">Cotización</h2>
+      <div class="table-responsive">
+        <table id="tabla-amortizacion">
+          <thead>
+            <tr>
+              <th>Mes</th>
+              <th>Saldo de Capital</th>
+              <th>Pago a Capital</th>
+              <th>Pago de Interés Ordinarios</th>
+              <th>Pago Fijo Mensual</th>
+              <th>Pago IVA Intereses*</th>
+              <th>Pago Mensual Total**</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Generado dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
